@@ -42,7 +42,7 @@ export default {
         (response) => {
           const { token, expired } = response.data // 解構賦值
           document.cookie = `hexschoolToken=${token};expires=${new Date(expired)}; path=/`
-          this.$router.push('/admin/products')
+          this.$router.push('/')
         }
       ).catch(
         (error) => {
