@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <div class="container">
+      <AdminLoading :active="isLoading" :z-index="1060"></AdminLoading>
       <div class="text-end mt-4">
         <button class="btn btn-primary" @click="openModal('new')">建立新的產品</button>
       </div>
@@ -35,10 +36,10 @@
         </tbody>
       </table>
       <!-- 分頁元件 -->
-      <ProductsPagination :pages="pagination" @emit-pages="getData"></ProductsPagination>
+      <AdminPagination :pages="pagination" @emit-pages="getData"></AdminPagination>
       <ProductModal
         @update-product="updateProduct"
-        :product="tempProduct"
+        :product="productDetail"
         :isNew="isNew"
         ref="productModal"
       ></ProductModal>
@@ -49,24 +50,24 @@
 </template>
 
 <script>
-import ProductsPagination from '@/components/Administrator/ProductsPagination.vue'
+import AdminPagination from '@/components/Administrator/AdminPagination.vue'
 import ProductModal from '@/components/Administrator/ProductModal.vue'
 import DelModal from '@/components/Administrator/DelModal.vue'
 
 export default {
   data () {
     return {
-      products: [],
-      productDetail: {},
       isNew: false,
       idLoading: false,
+      products: [],
+      productDetail: {},
       pagination: {}
     }
   },
   components: {
-    ProductsPagination,
     ProductModal,
-    DelModal
+    DelModal,
+    AdminPagination
   },
   methods: {
     // 取得產品資料

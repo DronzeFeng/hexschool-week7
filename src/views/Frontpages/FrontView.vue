@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import FrontNavbar from '@/components/FrontNavbar.vue'
+import FrontNavbar from '@/components/Frontpages/FrontNavbar.vue'
 export default {
   components: {
     FrontNavbar

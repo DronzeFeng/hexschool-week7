@@ -1,12 +1,12 @@
 <template>
-  <BackendNavbar></BackendNavbar>
+  <AdminNavbar></AdminNavbar>
 </template>
 
 <script>
-import BackendNavbar from '@/components/Administrator/BackendNavbar.vue'
+import AdminNavbar from '@/components/Administrator/AdminNavbar.vue'
 export default {
   components: {
-    BackendNavbar
+    AdminNavbar
   }
 }
 </script>
