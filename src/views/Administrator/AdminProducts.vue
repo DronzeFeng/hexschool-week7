@@ -35,27 +35,38 @@
         </tbody>
       </table>
       <!-- 分頁元件 -->
-      <AdminPagination :pages="pagination" @emit-pages="getData"></AdminPagination>
+      <ProductsPagination :pages="pagination" @emit-pages="getData"></ProductsPagination>
+      <ProductModal
+        @update-product="updateProduct"
+        :product="tempProduct"
+        :isNew="isNew"
+        ref="productModal"
+      ></ProductModal>
+      <!-- DelModal -->
+      <DelModal :item="tempProductDetail" ref="delModal" @del-item="delProduct"></DelModal>
     </div>
   </div>
 </template>
 
 <script>
-import AdminPagination from '@/components/AdminPagination.vue'
+import ProductsPagination from '@/components/Administrator/ProductsPagination.vue'
+import ProductModal from '@/components/Administrator/ProductModal.vue'
+import DelModal from '@/components/Administrator/DelModal.vue'
 
 export default {
   data () {
     return {
       products: [],
+      productDetail: {},
       isNew: false,
-      productDetail: {
-        imagesUrl: []
-      },
+      idLoading: false,
       pagination: {}
     }
   },
   components: {
-    AdminPagination
+    ProductsPagination,
+    ProductModal,
+    DelModal
   },
   methods: {
     // 取得產品資料
@@ -70,6 +81,28 @@ export default {
           console.log(err.data.message)
         }
       )
+    },
+    // 觸發Modal的情境
+    openModal (status, item) {
+      const productModal = this.$refs.productModal
+      const delModal = this.$refs.delModal
+      if (status === 'new') {
+        this.productDetail = {
+          imagesUrl: []
+        }
+        productModal.show()
+        this.isNew = true
+      } else if (status === 'edit') {
+        // this.productDetail = { ..item }; // 淺拷貝
+        const tempProductDetail = JSON.parse(JSON.stringify({ ...item })) // 深拷貝
+        this.productDetail = tempProductDetail
+        productModal.show()
+        this.isNew = false
+      } else if (status === 'delete') {
+        const tempProductDetail = JSON.parse(JSON.stringify({ ...item })) // 深拷貝
+        this.productDetail = tempProductDetail
+        delModal.show()
+      }
     }
   },
   mounted () {

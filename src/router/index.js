@@ -3,21 +3,21 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    component: () => import('../views/BackendView.vue'),
+    component: () => import('../views/Administrator/AdminView.vue'),
     children: [
       {
         path: 'products',
-        component: () => import('../views/AdminProducts.vue')
+        component: () => import('../views/Administrator/AdminProducts.vue')
       },
       {
         path: 'orders',
-        component: () => import('../views/AdminOrders.vue')
+        component: () => import('../views/Administrator/AdminOrders.vue')
       }
     ]
   },
   {
     path: '/login',
-    component: () => import('../views/LoginView.vue')
+    component: () => import('../views/Administrator/LoginView.vue')
   }
 ]
 
