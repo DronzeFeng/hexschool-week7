@@ -20,8 +20,8 @@
           <tr v-for="item in products" :key="item.id">
             <td>{{ item.category }}</td>
             <td>{{ item.title }}</td>
-            <td class="text-end">{{ item.origin_price }}</td>
-            <td class="text-end">{{ item.price }}</td>
+            <td class="text-end">{{ $filters.currency(item.origin_price) }}</td>
+            <td class="text-end">{{ $filters.currency(item.price) }}</td>
             <td>
               <span class="text-success" v-if="item.is_enabled">啟用</span>
               <span v-else>未啟用</span>
@@ -37,6 +37,7 @@
       </table>
       <!-- 分頁元件 -->
       <AdminPagination :pages="pagination" @emit-pages="getData"></AdminPagination>
+      <!-- ProductModal -->
       <ProductModal
         @update-product="updateProduct"
         :product="productDetail"
@@ -44,7 +45,7 @@
         ref="productModal"
       ></ProductModal>
       <!-- DelModal -->
-      <DelModal :item="tempProductDetail" ref="delModal" @del-item="delProduct"></DelModal>
+      <DelModal :item="productDetail" ref="delProductModal" @del-item="delProduct"></DelModal>
     </div>
   </div>
 </template>
@@ -58,10 +59,15 @@ export default {
   data () {
     return {
       isNew: false,
-      idLoading: false,
+      isLoading: false,
       products: [],
       productDetail: {},
-      pagination: {}
+      pagination: {},
+      currentPage: 1,
+      modal: {
+        editModal: '',
+        delModal: ''
+      }
     }
   },
   components: {
@@ -72,41 +78,87 @@ export default {
   methods: {
     // 取得產品資料
     getData (page = 1) {
-      this.$http(`${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/products?page=${page}`).then(
+      this.currentPage = page
+      this.$http.get(`${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/products?page=${page}`).then(
         (res) => {
           this.products = res.data.products
           this.pagination = res.data.pagination
+          this.isLoading = false
         }
       ).catch(
         (err) => {
-          console.log(err.data.message)
+          this.isLoading = false
+          this.$httpMessageState(err.response, '錯誤訊息')
         }
       )
     },
     // 觸發Modal的情境
     openModal (status, item) {
       const productModal = this.$refs.productModal
-      const delModal = this.$refs.delModal
       if (status === 'new') {
-        this.productDetail = {
-          imagesUrl: []
-        }
-        productModal.show()
+        this.productDetail = {}
         this.isNew = true
+        productModal.openModal()
       } else if (status === 'edit') {
-        // this.productDetail = { ..item }; // 淺拷貝
-        const tempProductDetail = JSON.parse(JSON.stringify({ ...item })) // 深拷貝
-        this.productDetail = tempProductDetail
-        productModal.show()
+        this.productDetail = { ...item } // 深拷貝
         this.isNew = false
+        productModal.openModal()
       } else if (status === 'delete') {
-        const tempProductDetail = JSON.parse(JSON.stringify({ ...item })) // 深拷貝
-        this.productDetail = tempProductDetail
-        delModal.show()
+        this.productDetail = { ...item } // 深拷貝
+        const delProductModal = this.$refs.delProductModal
+        delProductModal.openModal()
       }
+    },
+    // 更新產品資訊
+    updateProduct (item) {
+      let url = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product`
+      let method = 'post'
+      let status = '新增產品'
+      this.productDetail = item
+      this.isLoading = true
+      // 判斷是否為新增產品
+      if (!this.isNew) {
+        // 修改產品資訊
+        url = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product/${this.product.id}`
+        method = 'put'
+        status = '更新產品'
+      }
+      const productModal = this.$refs.productModal
+      this.$http[method](url, { data: this.productDetail }).then(
+        (res) => {
+          this.isLoading = false
+          this.$httpMessageState(res, status)
+          productModal.hideModal()
+          this.getData(this.currentPage)
+        }
+      ).catch(
+        (err) => {
+          this.isLoading = false
+          this.$httpMessageState(err.response, status)
+        }
+      )
+    },
+    // 刪除產品
+    delProduct () {
+      const url = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product/${this.productDetail.id}`
+      this.isLoading = true
+      this.$http.delete(url).then(
+        (res) => {
+          this.isLoading = false
+          this.$httpMessageState(res, '刪除產品')
+          const delProductModal = this.$refs.delProductModal
+          delProductModal.hideModal()
+          this.getData(this.currentPage)
+        }
+      ).catch(
+        (err) => {
+          this.isLoading = false
+          this.$httpMessageState(err.response, '刪除產品')
+        }
+      )
     }
   },
-  mounted () {
+  created () {
     this.getData()
   }
 }

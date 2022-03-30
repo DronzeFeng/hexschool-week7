@@ -83,7 +83,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
-          <button type="button" class="btn btn-primary" @click="updateProduct">確認</button>
+          <button type="button" class="btn btn-primary" @click="$emit('update-product', tempProduct)">確認</button>
         </div>
       </div>
     </div>
@@ -91,13 +91,19 @@
 </template>
 
 <script>
+import modalMixin from '@/mixins/modalMixin'
+// import emitter from '@/libs/emitter'
 export default {
+  props: ['product', 'isNew'],
   data () {
     return {
       status: {},
+      modal: '',
       tempProduct: {}
     }
   },
+  emits: ['update-product'],
+  mixins: [modalMixin],
   watch: {
     product () {
       this.tempProduct = this.product
