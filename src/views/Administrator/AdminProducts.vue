@@ -63,11 +63,7 @@ export default {
       products: [],
       productDetail: {},
       pagination: {},
-      currentPage: 1,
-      modal: {
-        editModal: '',
-        delModal: ''
-      }
+      currentPage: 1
     }
   },
   components: {
@@ -119,7 +115,7 @@ export default {
       // 判斷是否為新增產品
       if (!this.isNew) {
         // 修改產品資訊
-        url = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product/${this.product.id}`
+        url = `${process.env.VUE_APP_API}/api/${process.env.VUE_APP_PATH}/admin/product/${this.productDetail.id}`
         method = 'put'
         status = '更新產品'
       }
@@ -134,7 +130,7 @@ export default {
       ).catch(
         (err) => {
           this.isLoading = false
-          this.$httpMessageState(err.response, status)
+          this.$httpMessageState(err.res, status)
         }
       )
     },
