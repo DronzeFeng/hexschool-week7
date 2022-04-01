@@ -1,4 +1,4 @@
-# week6
+# week7
 
 ## Project setup
 ```
